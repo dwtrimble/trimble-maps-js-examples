@@ -9,11 +9,13 @@ These examples primarily focus on cstom layers: https://developer.trimblemaps.co
 ```
 js-example-project
 ├── src
-│   └── Drivers.html    # Sample of drivers grouped with circles indicating the number of drivers by size http://127.0.0.1:8080/Drivers.html
-│   └── GeoJSON.html    # Draw a GeoJSON for an area, a very simple area, as a square. http://127.0.0.1:8080/GeoJSON.html
-│   └── Lane.html       # Draw a lane with end points as circles. http://127.0.0.1:8080/Lane.html
-├── package.json       # Configuration file for npm
-└── README.md          # Documentation for the project
+│   └── Drivers.html      # Sample of drivers grouped with circles indicating the number of drivers by size http://127.0.0.1:8080/Drivers.html
+│   └── GeoJSON.html      # Draw a GeoJSON for an area, a very simple area, as a square. http://127.0.0.1:8080/GeoJSON.html
+│   └── Lane.html         # Draw a lane with end points as circles. http://127.0.0.1:8080/Lane.html
+│   └── DrawLanes.html    # Multiple lanes with end points. http://127.0.0.1:8080/DrawLanes.html
+│   └── Mississippi.html  # We had the CoPilot Agent draw the Mississippi river on the map for demonstration. http://127.0.0.1:8080/Mississippi.html
+├── package.json          # Configuration file for npm
+└── README.md             # Documentation for the project
 ```
 
 ## Getting Started
