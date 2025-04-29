@@ -60,6 +60,21 @@
                         }
                     });
 
+                    // Add a layer for the lane label
+                    this.map.addLayer({
+                        id: `${sourceId}-label`,
+                        source: sourceId,
+                        type: 'symbol',
+                        layout: {
+                            'text-field': `${lane.pickup_service_area_name} to ${lane.delivery_service_area_name}`,
+                            'text-size': 12,
+                            'symbol-placement': 'line-center'
+                        },
+                        paint: {
+                            'text-color': 'black'
+                        }
+                    });
+
                     const endpoints = {
                         type: "FeatureCollection",
                         features: [

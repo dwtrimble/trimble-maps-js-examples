@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Mississippi River Cities</title>
+        <link rel="stylesheet" href="https://maps-sdk.trimblemaps.com/v4/trimblemaps-4.2.2.css" />
+        <script src="https://maps-sdk.trimblemaps.com/v4/trimblemaps-4.2.2.js"></script>
+        <style>
+            body { margin: 0; padding: 0; }
+
+            #map {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+
+        <script>
+            const API_KEY = '97CF83F20CB9E042A7D3F4FEAE006BFE';
+            TrimbleMaps.setAPIKey(API_KEY);
+
+            const map = new TrimbleMaps.Map({
+                container: 'map',
+                style: TrimbleMaps.Common.Style.TRANSPORTATION,
+                center: [-91, 35], // Centered along the Mississippi River
+                zoom: 5
+            });
+
+            // Define 10 random cities along the Mississippi River
+            const cities = [
+                { name: 'Minneapolis', coordinates: [-93.2650, 44.9778] },
+                { name: 'St. Louis', coordinates: [-90.1994, 38.6270] },
+                { name: 'Memphis', coordinates: [-90.0489, 35.1495] },
+                { name: 'Baton Rouge', coordinates: [-91.1403, 30.4515] },
+                { name: 'New Orleans', coordinates: [-90.0715, 29.9511] },
+                { name: 'Dubuque', coordinates: [-90.6656, 42.5006] },
+                { name: 'La Crosse', coordinates: [-91.2396, 43.8014] },
+                { name: 'Vicksburg', coordinates: [-90.8779, 32.3526] },
+                { name: 'Natchez', coordinates: [-91.4032, 31.5604] },
+                { name: 'Cape Girardeau', coordinates: [-89.5181, 37.3059] }
+            ];
+
+            // Sort cities from North to South based on latitude
+            const sortedCities = cities.sort((a, b) => b.coordinates[1] - a.coordinates[1]);
+
+            // Update GeoJSON for the sorted cities and the line connecting them
+            const sortedCityPoints = {
+                type: 'FeatureCollection',
+                features: sortedCities.map(city => ({
+                    type: 'Feature',
+                    properties: { name: city.name },
+                    geometry: {
+                        type: 'Point',
+                        coordinates: city.coordinates
+                    }
+                }))
+            };
+
+            const sortedCityLine = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: sortedCities.map(city => city.coordinates)
+                        }
+                    }
+                ]
+            };
+
+            map.on('load', function () {
+                // Add the city points GeoJSON as a source
+                map.addSource('cityPoints', {
+                    type: 'geojson',
+                    data: sortedCityPoints
+                });
+
+                // Add a layer for the city points
+                map.addLayer({
+                    id: 'cityPoints',
+                    source: 'cityPoints',
+                    type: 'circle',
+                    paint: {
+                        'circle-color': 'blue',
+                        'circle-radius': 6
+                    }
+                });
+
+                // Add the city line GeoJSON as a source
+                map.addSource('cityLine', {
+                    type: 'geojson',
+                    data: sortedCityLine
+                });
+
+                // Add a layer for the line connecting the cities
+                map.addLayer({
+                    id: 'cityLine',
+                    source: 'cityLine',
+                    type: 'line',
+                    paint: {
+                        'line-color': 'red',
+                        'line-width': 4
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
