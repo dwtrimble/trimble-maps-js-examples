@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="https://maps-sdk.trimblemaps.com/v4/trimblemaps-4.2.2.css" />
+        <script src="https://maps-sdk.trimblemaps.com/v4/trimblemaps-4.2.2.js"></script>
+        <style>
+            body { margin: 0; padding: 0; }
+
+            #map {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+
+        <script>
+            TrimbleMaps.setAPIKey('97CF83F20CB9E042A7D3F4FEAE006BFE');
+            const map = new TrimbleMaps.Map({
+                container: 'map', // container id
+                style: TrimbleMaps.Common.Style.TRANSPORTATION, // hosted style id
+                center: [-97, 33], // Centered around DFW
+                zoom: 8 // Adjusted zoom level
+            });
+        
+            // Define the GeoJSON for the DFW box
+            var dfwBox = {
+                type: "FeatureCollection",
+                features: [
+                    {
+                        type: "Feature",
+                        geometry: {
+                            type: "Polygon",
+                            coordinates: [
+                                [
+                                    [-97.5, 33.5], // Top-left corner
+                                    [-96.5, 33.5], // Top-right corner
+                                    [-96.5, 32.5], // Bottom-right corner
+                                    [-97.5, 32.5], // Bottom-left corner
+                                    [-97.5, 33.5]  // Closing the polygon
+                                ]
+                            ]
+                        },
+                        properties: {}
+                    }
+                ]
+            };
+        
+            // Wait for the map to load before adding layers and data sources
+            map.on('load', function () {
+                // Add the DFW box GeoJSON as a source
+                map.addSource('dfwBox', {
+                    type: 'geojson',
+                    data: dfwBox
+                });
+        
+                // Add a layer for the boundary (blue line)
+                map.addLayer({
+                    'id': 'dfwBoxBoundary',
+                    'source': 'dfwBox',
+                    'type': 'line',
+                    'paint': {
+                        'line-color': 'blue',
+                        'line-width': 2
+                    }
+                });
+        
+                // Add a layer for the fill (light blue)
+                map.addLayer({
+                    'id': 'dfwBoxFill',
+                    'source': 'dfwBox',
+                    'type': 'fill',
+                    'paint': {
+                        'fill-color': 'lightblue',
+                        'fill-opacity': 0.5
+                    }
+                });
+            });
+        </script>
+
+    </body>
+</html>

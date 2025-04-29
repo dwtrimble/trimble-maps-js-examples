@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="https://maps-sdk.trimblemaps.com/v4/trimblemaps-4.2.2.css" />
+        <script src="https://maps-sdk.trimblemaps.com/v4/trimblemaps-4.2.2.js"></script>
+        <style>
+            body { margin: 0; padding: 0; }
+
+            #map {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+
+        <script>
+            TrimbleMaps.setAPIKey('97CF83F20CB9E042A7D3F4FEAE006BFE');
+            const map = new TrimbleMaps.Map({
+                container: 'map', // container id
+                style: TrimbleMaps.Common.Style.TRANSPORTATION, // hosted style id
+                center: [-91, 35], // Centered between Dallas and Nashville
+                zoom: 5 // Adjusted zoom level
+            });
+        
+            // Define GeoJSON for the line between Dallas and Nashville
+            var dallasToNashvilleLine = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: [
+                                [-96.7970, 32.7767], // Dallas
+                                [-86.7816, 36.1627]  // Nashville
+                            ]
+                        }
+                    }
+                ]
+            };
+        
+            // Define GeoJSON for the endpoints (Dallas and Nashville)
+            var endpoints = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: { name: 'Dallas' },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [-96.7970, 32.7767] // Dallas
+                        }
+                    },
+                    {
+                        type: 'Feature',
+                        properties: { name: 'Nashville' },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [-86.7816, 36.1627] // Nashville
+                        }
+                    }
+                ]
+            };
+        
+            // Wait for the map to load before adding layers and data sources
+            map.on('load', function () {
+                // Add the line GeoJSON as a source
+                map.addSource('dallasToNashvilleLine', {
+                    type: 'geojson',
+                    data: dallasToNashvilleLine
+                });
+        
+                // Add a layer to render the line
+                map.addLayer({
+                    'id': 'dallasToNashvilleLine',
+                    'source': 'dallasToNashvilleLine',
+                    'type': 'line',
+                    'paint': {
+                        'line-color': 'blue',
+                        'line-width': 4
+                    }
+                });
+        
+                // Add the endpoints GeoJSON as a source
+                map.addSource('endpoints', {
+                    type: 'geojson',
+                    data: endpoints
+                });
+        
+                // Add a layer for the blue inner circle
+                map.addLayer({
+                    'id': 'endpoints-inner',
+                    'source': 'endpoints',
+                    'type': 'circle',
+                    'paint': {
+                        'circle-color': 'blue',
+                        'circle-radius': 6
+                    }
+                });
+        
+                // Add a layer for the white outer circle
+                map.addLayer({
+                    'id': 'endpoints-outer',
+                    'source': 'endpoints',
+                    'type': 'circle',
+                    'paint': {
+                        'circle-color': 'white',
+                        'circle-radius': 8
+                    }
+                });
+        
+                // Add a layer for the blue boundary
+                map.addLayer({
+                    'id': 'endpoints-boundary',
+                    'source': 'endpoints',
+                    'type': 'circle',
+                    'paint': {
+                        'circle-color': 'transparent',
+                        'circle-stroke-color': 'blue',
+                        'circle-stroke-width': 2,
+                        'circle-radius': 8
+                    }
+                });
+            });
+        </script>
+
+
+</body>
+</html>

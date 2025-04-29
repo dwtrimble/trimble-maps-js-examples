@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="https://maps-sdk.trimblemaps.com/v4/trimblemaps-4.2.2.css" />
+        <script src="https://maps-sdk.trimblemaps.com/v4/trimblemaps-4.2.2.js"></script>
+        <style>
+            body { margin: 0; padding: 0; }
+
+            #map {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+
+        <script>
+            TrimbleMaps.setAPIKey('97CF83F20CB9E042A7D3F4FEAE006BFE');
+            const map = new TrimbleMaps.Map({
+                container: 'map', // container id
+                style: TrimbleMaps.Common.Style.TRANSPORTATION, // hosted style id
+                center: [-91, 33], // Centered between Dallas, New Orleans, and Atlanta
+                zoom: 5 // Adjusted zoom level
+            });
+
+            // Define GeoJSON for driver clusters
+            var driverClusters = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: { count: 3 },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [-96.7970, 32.7767] // Dallas
+                        }
+                    },
+                    {
+                        type: 'Feature',
+                        properties: { count: 2 },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [-90.0715, 29.9511] // New Orleans
+                        }
+                    },
+                    {
+                        type: 'Feature',
+                        properties: { count: 1 },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [-84.3880, 33.7490] // Atlanta
+                        }
+                    }
+                ]
+            };
+
+            // Wait for the map to load before adding layers and data sources
+            map.on('load', function () {
+                // Add the driver clusters GeoJSON as a source
+                map.addSource('driverClusters', {
+                    type: 'geojson',
+                    data: driverClusters
+                });
+
+                // Add a layer to render the clusters as circles
+                map.addLayer({
+                    'id': 'driverClusters',
+                    'source': 'driverClusters',
+                    'type': 'circle',
+                    'paint': {
+                        'circle-color': [
+                            'step',
+                            ['get', 'count'],
+                            'blue', // 1 driver
+                            2, 'green', // 2 drivers
+                            3, 'red' // 3 drivers
+                        ],
+                        'circle-radius': [
+                            'step',
+                            ['get', 'count'],
+                            6, // 1 driver
+                            2, 10, // 2 drivers
+                            3, 14 // 3 drivers
+                        ]
+                    }
+                });
+
+                // Add a layer for the hoverable text
+                map.addLayer({
+                    'id': 'driverClusterLabels',
+                    'source': 'driverClusters',
+                    'type': 'symbol',
+                    'layout': {
+                        'text-field': ['get', 'count'],
+                        'text-size': 12,
+                        'text-offset': [0, 1.5],
+                        'text-anchor': 'top'
+                    },
+                    'paint': {
+                        'text-color': 'black'
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
