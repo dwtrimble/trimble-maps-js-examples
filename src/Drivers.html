@@ -19,7 +19,8 @@
         <div id="map"></div>
 
         <script>
-            TrimbleMaps.setAPIKey('97CF83F20CB9E042A7D3F4FEAE006BFE');
+            const API_KEY = '97CF83F20CB9E042A7D3F4FEAE006BFE';
+            TrimbleMaps.setAPIKey(API_KEY);
             const map = new TrimbleMaps.Map({
                 container: 'map', // container id
                 style: TrimbleMaps.Common.Style.TRANSPORTATION, // hosted style id

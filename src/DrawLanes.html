@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw Lanes</title>
+    <link rel="stylesheet" href="https://maps-sdk.trimblemaps.com/v4/trimblemaps-4.2.2.css">
+    <script src="https://maps-sdk.trimblemaps.com/v4/trimblemaps-4.2.2.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        class LaneDrawer {
+            constructor(map) {
+                this.map = map;
+            }
+
+            drawLanes(lanes) {
+                lanes.forEach(lane => {
+                    const coordinates = [
+                        [lane.pickup_service_area_longitude_value, lane.pickup_service_area_latitude_value],
+                        [lane.delivery_service_area_longitude_value, lane.delivery_service_area_latitude_value]
+                    ];
+
+                    const laneGeoJSON = {
+                        type: "FeatureCollection",
+                        features: [
+                            {
+                                type: "Feature",
+                                geometry: {
+                                    type: "LineString",
+                                    coordinates: coordinates
+                                },
+                                properties: {
+                                    name: `${lane.pickup_service_area_name} to ${lane.delivery_service_area_name}`
+                                }
+                            }
+                        ]
+                    };
+
+                    const sourceId = `${lane.pickup_service_area_id}-${lane.delivery_service_area_id}`;
+
+                    this.map.addSource(sourceId, {
+                        type: 'geojson',
+                        data: laneGeoJSON
+                    });
+
+                    this.map.addLayer({
+                        id: `${sourceId}-line`,
+                        type: 'line',
+                        source: sourceId,
+                        paint: {
+                            'line-color': 'green',
+                            'line-width': 6
+                        }
+                    });
+
+                    const endpoints = {
+                        type: "FeatureCollection",
+                        features: [
+                            {
+                                type: "Feature",
+                                properties: { name: lane.pickup_service_area_name },
+                                geometry: {
+                                    type: "Point",
+                                    coordinates: [lane.pickup_service_area_longitude_value, lane.pickup_service_area_latitude_value]
+                                }
+                            },
+                            {
+                                type: "Feature",
+                                properties: { name: lane.delivery_service_area_name },
+                                geometry: {
+                                    type: "Point",
+                                    coordinates: [lane.delivery_service_area_longitude_value, lane.delivery_service_area_latitude_value]
+                                }
+                            }
+                        ]
+                    };
+
+                    this.map.addSource(`${sourceId}-endpoints`, {
+                        type: 'geojson',
+                        data: endpoints
+                    });
+
+                    this.map.addLayer({
+                        id: `${sourceId}-endpoints-inner`,
+                        source: `${sourceId}-endpoints`,
+                        type: 'circle',
+                        paint: {
+                            'circle-color': 'green',
+                            'circle-radius': 6
+                        }
+                    });
+
+                    this.map.addLayer({
+                        id: `${sourceId}-endpoints-outer`,
+                        source: `${sourceId}-endpoints`,
+                        type: 'circle',
+                        paint: {
+                            'circle-color': 'white',
+                            'circle-radius': 8
+                        }
+                    });
+
+                    this.map.addLayer({
+                        id: `${sourceId}-endpoints-boundary`,
+                        source: `${sourceId}-endpoints`,
+                        type: 'circle',
+                        paint: {
+                            'circle-color': 'transparent',
+                            'circle-stroke-color': 'green',
+                            'circle-stroke-width': 2,
+                            'circle-radius': 8
+                        }
+                    });
+                });
+            }
+        }
+
+        // Initialize the map
+        const API_KEY = '97CF83F20CB9E042A7D3F4FEAE006BFE';
+        TrimbleMaps.setAPIKey(API_KEY);
+        const map = new TrimbleMaps.Map({
+            container: 'map',
+            style: TrimbleMaps.Common.Style.TRANSPORTATION,
+            center: [-75, 40],
+            zoom: 5
+        });
+
+        map.on('load', () => {
+            const lanesData = {
+                "request_id": "0299d204-97ee-4fe5-8dfc-e6a0e6e719c6",
+                "lane_count": 93,
+                "lanes": [
+                    {
+                        "pickup_service_area_id": "CT-HAR",
+                        "pickup_service_area_name": "CT - Hartford",
+                        "pickup_service_area_latitude_value": 41.7626,
+                        "pickup_service_area_longitude_value": -72.6742,
+                        "delivery_service_area_id": "NY-BUF",
+                        "delivery_service_area_name": "NY - Buffalo",
+                        "delivery_service_area_latitude_value": 42.608,
+                        "delivery_service_area_longitude_value": -78.7651,
+                        "freight_order_count": 2,
+                        "freight_order_bad_data_order_count": 0,
+                        "total_revenue_usd_amount": 1200.0,
+                        "linehaul_revenue_usd_amount": 1030.04,
+                        "fuel_surcharge_usd_amount": 169.96,
+                        "accessorial_revenue_usd_amount": null,
+                        "travel_distance_miles_amount": 966.0,
+                        "billable_distance_miles_amount": 922.0
+                    },
+                    {
+                        "pickup_service_area_id": "CT-HAR",
+                        "pickup_service_area_name": "CT - Hartford",
+                        "pickup_service_area_latitude_value": 41.7626,
+                        "pickup_service_area_longitude_value": -72.6742,
+                        "delivery_service_area_id": "NY-ROC",
+                        "delivery_service_area_name": "NY - Rochester",
+                        "delivery_service_area_latitude_value": 42.5561,
+                        "delivery_service_area_longitude_value": -77.3232,
+                        "freight_order_count": 2,
+                        "freight_order_bad_data_order_count": 0,
+                        "total_revenue_usd_amount": 1150.0,
+                        "linehaul_revenue_usd_amount": 940.17,
+                        "fuel_surcharge_usd_amount": 159.83,
+                        "accessorial_revenue_usd_amount": 50.0,
+                        "travel_distance_miles_amount": 795.0,
+                        "billable_distance_miles_amount": 616.0,
+                        "loaded_distance_miles_amount": 616.0,
+                        "empty_distance_miles_amount": 179.0,
+                        "pta_to_last_stop_departure_hours_duration": null,
+                        "dispatch_to_last_stop_departure_hours_duration": 42.97,
+                        "average_dispatch_to_last_stop_departure_hours_duration": 21.48,
+                        "first_stop_to_last_stop_hours_duration": 41.17,
+                        "average_first_stop_to_last_stop_hours_duration": 20.58,
+                        "first_stop_departure_to_final_stop_arrival_hours_duration": 41.17,
+                        "average_first_stop_departure_to_final_stop_arrival_hours_duration": 20.58,
+                        "standard_transit_hours_duration": 11.2,
+                        "average_standard_transit_hours_duration": 5.6,
+                        "netwise_dwell_hours_duration": null,
+                        "netwise_in_transit_delay_hours_duration": 29.97,
+                        "average_netwise_in_transit_delay_hours_duration": 14.98,
+                        "netwise_delay_hours_duration": null,
+                        "load_hours_duration": 0.0,
+                        "average_load_hours_duration": 0.0,
+                        "unload_hours_duration": 0.0,
+                        "average_unload_hours_duration": 0.0,
+                        "empty_transit_hours_duration": 3.63,
+                        "average_empty_transit_hours_duration": 1.82,
+                        "pickup_party_count": 1,
+                        "average_scheduled_miles_per_hour": 58.11,
+                        "average_actual_miles_per_hour": 14.96,
+                        "average_scheduled_vs_actual_miles_per_hour": 0.26,
+                        "average_scheduled_vs_actual_miles_per_hour_rank": 51,
+                        "linehaul_rate_usd_amount": 1.53,
+                        "lane_yield_usd": 85.62
+                    },
+                    {
+                        "pickup_service_area_id": "CT-HAR",
+                        "pickup_service_area_name": "CT - Hartford",
+                        "pickup_service_area_latitude_value": 41.7626,
+                        "pickup_service_area_longitude_value": -72.6742,
+                        "delivery_service_area_id": "PA-STA",
+                        "delivery_service_area_name": "PA - State College",
+                        "delivery_service_area_latitude_value": 40.6003,
+                        "delivery_service_area_longitude_value": -78.5549,
+                        "freight_order_count": 1,
+                        "freight_order_bad_data_order_count": 0,
+                        "total_revenue_usd_amount": 500.0,
+                        "linehaul_revenue_usd_amount": 427.35,
+                        "fuel_surcharge_usd_amount": 72.65,
+                        "accessorial_revenue_usd_amount": null,
+                        "travel_distance_miles_amount": 473.0,
+                        "billable_distance_miles_amount": 439.0,
+                        "loaded_distance_miles_amount": 439.0,
+                        "empty_distance_miles_amount": 34.0,
+                        "pta_to_last_stop_departure_hours_duration": null,
+                        "dispatch_to_last_stop_departure_hours_duration": 24.58,
+                        "average_dispatch_to_last_stop_departure_hours_duration": 24.58,
+                        "first_stop_to_last_stop_hours_duration": 24.0,
+                        "average_first_stop_to_last_stop_hours_duration": 24.0,
+                        "first_stop_departure_to_final_stop_arrival_hours_duration": 24.0,
+                        "average_first_stop_departure_to_final_stop_arrival_hours_duration": 24.0,
+                        "standard_transit_hours_duration": 8.48,
+                        "average_standard_transit_hours_duration": 8.48,
+                        "netwise_dwell_hours_duration": null,
+                        "netwise_in_transit_delay_hours_duration": 15.52,
+                        "average_netwise_in_transit_delay_hours_duration": 15.52,
+                        "netwise_delay_hours_duration": null,
+                        "load_hours_duration": 0.0,
+                        "average_load_hours_duration": 0.0,
+                        "unload_hours_duration": 0.0,
+                        "average_unload_hours_duration": 0.0,
+                        "empty_transit_hours_duration": 0.58,
+                        "average_empty_transit_hours_duration": 0.58,
+                        "pickup_party_count": 1,
+                        "average_scheduled_miles_per_hour": 58.02,
+                        "average_actual_miles_per_hour": 18.29,
+                        "average_scheduled_vs_actual_miles_per_hour": 0.32,
+                        "average_scheduled_vs_actual_miles_per_hour_rank": 167,
+                        "linehaul_rate_usd_amount": 0.97,
+                        "lane_yield_usd": 68.73
+                    },
+                    {
+                        "pickup_service_area_id": "DC-WAS",
+                        "pickup_service_area_name": "DC-Baltimore",
+                        "pickup_service_area_latitude_value": 39.0192,
+                        "pickup_service_area_longitude_value": -77.3235,
+                        "delivery_service_area_id": "NY-ROC",
+                        "delivery_service_area_name": "NY - Rochester",
+                        "delivery_service_area_latitude_value": 42.5561,
+                        "delivery_service_area_longitude_value": -77.3232,
+                        "freight_order_count": 2,
+                        "freight_order_bad_data_order_count": 0,
+                        "total_revenue_usd_amount": 1484.28,
+                        "linehaul_revenue_usd_amount": 1101.02,
+                        "fuel_surcharge_usd_amount": 348.68,
+                        "accessorial_revenue_usd_amount": 34.58,
+                        "travel_distance_miles_amount": 810.0,
+                        "billable_distance_miles_amount": 763.0,
+                        "loaded_distance_miles_amount": 763.0,
+                        "empty_distance_miles_amount": 47.0,
+                        "pta_to_last_stop_departure_hours_duration": null,
+                        "dispatch_to_last_stop_departure_hours_duration": 40.8,
+                        "average_dispatch_to_last_stop_departure_hours_duration": 20.4,
+                        "first_stop_to_last_stop_hours_duration": 40.0,
+                        "average_first_stop_to_last_stop_hours_duration": 20.0,
+                        "first_stop_departure_to_final_stop_arrival_hours_duration": 40.0,
+                        "average_first_stop_departure_to_final_stop_arrival_hours_duration": 20.0,
+                        "standard_transit_hours_duration": 14.88,
+                        "average_standard_transit_hours_duration": 7.44,
+                        "netwise_dwell_hours_duration": null,
+                        "netwise_in_transit_delay_hours_duration": 25.12,
+                        "average_netwise_in_transit_delay_hours_duration": 12.56,
+                        "netwise_delay_hours_duration": null,
+                        "load_hours_duration": 0.0,
+                        "average_load_hours_duration": 0.0,
+                        "unload_hours_duration": 0.0,
+                        "average_unload_hours_duration": 0.0,
+                        "empty_transit_hours_duration": 0.8,
+                        "average_empty_transit_hours_duration": 0.4,
+                        "pickup_party_count": 2,
+                        "average_scheduled_miles_per_hour": 36.38,
+                        "average_actual_miles_per_hour": 19.05,
+                        "average_scheduled_vs_actual_miles_per_hour": 0.8,
+                        "average_scheduled_vs_actual_miles_per_hour_rank": 83,
+                        "linehaul_rate_usd_amount": 1.44,
+                        "lane_yield_usd": 94.31
+                    }
+                    // ...additional lanes data...
+                ]
+            };
+            const lanes = lanesData.lanes;
+            const laneDrawer = new LaneDrawer(map);
+            laneDrawer.drawLanes(lanes);
+
+        });
+    </script>
+</body>
+</html>

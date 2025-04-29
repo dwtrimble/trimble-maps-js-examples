@@ -1,6 +1,8 @@
 # js-example-project
 
 This project contains JavaScript code examples that can be executed or tested. It serves as a simple demonstration of various JavaScript features.
+Javascript MAPS SDK guide can be found at: https://developer.trimblemaps.com/features-guide/map-visualization/
+These examples primarily focus on cstom layers: https://developer.trimblemaps.com/maps-sdk/examples/custom-layers/
 
 ## Project Structure
 
