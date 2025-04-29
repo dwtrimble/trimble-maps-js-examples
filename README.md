@@ -20,12 +20,12 @@ To get started with this project, follow these steps:
 
 1. Clone the repository:
    ```
-   git clone <repository-url>
+   git clone https://github.com/dwtrimble/trimble-maps-js-examples
    ```
 
 2. Navigate to the project directory:
    ```
-   cd js-example-project
+   
    ```
 
 3. Install the dependencies:
